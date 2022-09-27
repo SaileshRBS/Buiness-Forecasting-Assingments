@@ -1,0 +1,30 @@
+---
+title: "Business Forecasting Homework 3"
+author: " Sailesh Potturi"
+date: "9/25/2022"
+output: html_document
+---
+```{r}
+library(fpp)
+fdeaths
+
+# The fdeaths (UKLungDeaths)  contains months starting from January to Decemberand Years starting from 1974 to 1979. It features the no of deaths due to lungs problems in the UK during the period of 1974 to 1979
+plot(fdeaths, main = "Deaths due to lung diseases in UK", xlab ="Years", ylab = "No. of Deaths")
+# The plot describes the no of deaths occured from January to December in a year wise and from the observation we can see that the year "1974" were in between 800-1000 and the month of January had more no of deaths which is 901 and this month had the highest no of deaths in that year. When observed the plot shows that the no of deaths from 1974-1979 from month to month  were somewhere between 300-1000+. But, in the year"1976" the month of Febuary had more no of deaths which were "1141" and the least no of deaths were recoreded in the year "1976" in the month of August. The another observation is that  in the mid season of every year the no of deaths were decreased and starting of the year we can see rise in no of deaths as well. Basing on this the plot looks like there is no Trend and it is Seasonal.
+
+Acf(fdeaths)
+
+# By ploting the ACF to fdeaths time series we can observe that it is a  wavy pattern above and below confidence interval , Basing on this we can observe that this is an Seasonal graph.
+
+deaths<-HoltWinters(fdeaths)
+attributes(deaths)
+plot(deaths)
+# After using the Holtwinters_filtering we can observe that there is no much of change in the graph , but we can see the year "1976" the graph is devaited . The original one had more than 1000+ deaths after applying the filter it shows near to 800 no of deaths.
+deaths_1<-forecast::forecast(deaths)
+attributes(deaths_1)
+plot(deaths_1)
+plot(deaths_1$ residuals)
+hist(deaths_1$residuals)
+accuracy(deaths_1)
+# When we use the accuracy function , we see the errors like RMSE and ACF1, accodring to the accuracy we see that Root Square Mean Error whcih shows the errors you how far predictions fall from measured true values. Autocorrelation of errors at lag 1 shows us the measure of how much is the current value influenced by the previous values in a time series.
+```
