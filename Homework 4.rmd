@@ -1,0 +1,78 @@
+---
+title: "Business Forecasting Homework 4"
+author: " Sailesh Potturi"
+date: "10/02/2022"
+output: html_document
+---
+```{r}
+library(ffp)
+library(fpp2)
+library(TTR)
+fdeaths
+attributes(fdeaths)
+plot(fdeaths)
+Acf(fdeaths)
+#take Mean of all available history
+
+mean_forecast <- meanf(fdeaths,15)
+plot(mean_forecast)
+# This plots the mean of the forecast for the given data "fdeaths".
+
+naive_forecast <- naive(fdeaths,10)
+plot(naive_forecast)
+# A naive forecast for the fdeaths is the forecast for the given period which is year in this case  and the value observed in the previous year.
+# Random Walk
+rwf_forecast <- rwf(fdeaths,5)
+rwf_forecast <- rwf(fdeaths,5, drift=TRUE)
+plot(rwf_forecast)
+
+# The Random walk forecast for the fdeaths almost shows the similar mean as compared to the naive forecast.To my assumption the rwf forecast isn't the ideal one for prediction.
+
+# Seasonal Naive
+snaive_forecast <- snaive(fdeaths,10)
+
+# The snaive forecast for the fdeaths shows that the next prediction is diping down so since the graph is a seasonal graph and the prediction would be seasonal as well. Accodring to my assumption this one will be the ideal one.
+
+# Moving Averages
+
+MA5_forecast <- ma(fdeaths,order=5)
+MA9_forecast <- ma(fdeaths,order=9)
+# The moving averages doesn't handle the seasonality graph well for the fdeaths dataset.
+
+# plot all in a single chart
+
+plot(mean_forecast)
+lines(naive_forecast$mean,col="red")
+lines(rwf_forecast$mean,col="green")
+lines(snaive_forecast$mean,col="black")
+lines(MA5_forecast,col="Pink")
+lines(MA9_forecast,col="Blue")
+# what other attributes are there?
+attributes(naive_forecast)
+# The attributes present in naive_forecast doesn't show "x", "fitted","series", "mean"
+
+# Decomposition
+ets_forecast <- ets(fdeaths)
+plot(ets_forecast)
+attributes(ets_forecast)
+ets_forecast$mse
+
+# The mean squared error in the forecast gives the value of 4312.345
+
+# HoltWinters
+HW_forecast <- HoltWinters(fdeaths)
+plot(HW_forecast)
+
+# According to my assumping and prediction the HoltWinters doesn't work well for my dataset called " fdeaths" since it is a seasonality.
+
+SSE_Simple <- HoltWinters(fdeaths,beta=FALSE,gamma=FALSE)
+attributes(SSE_Simple)
+plot(SSE_Simple)
+SSE_Simple$SSE
+head(SSE_Simple$fitted)
+#Forecast
+forecast_ets_1 <- forecast.ets(ets_forecast, h=5)
+plot(forecast_ets_1)
+forecast_ets_2 <- forecast(ets_forecast, h=5)
+plot(forecast_ets_2)
+```
