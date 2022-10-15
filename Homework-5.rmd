@@ -1,0 +1,69 @@
+---
+title: "Homework5"
+author: "Sailesh Potturi"
+date: "10/10/2022"
+output: html_document
+---
+  
+## Decompose
+  
+* Data Set used - fdeaths
+
+```{r}
+library(fpp)
+library(fpp2)
+
+head(fdeaths)
+plot(fdeaths)
+stl_decomp <- stl(fdeaths,s.window ="periodic")
+plot(stl_decomp)
+attributes(stl_decomp)
+```
+* Decompose function is used to separate the the trend, seasonality and the irregularity in the data.
+* From the plot above, we can see that there is a seasonality in the data and there is an downward trend.
+
+
+```{r}
+seasadj(stl_decomp)
+
+plot(fdeaths)
+lines(seasadj(stl_decomp), col="Red")
+```
+
+* The seasadj function adjusts the seasonality of the data and gives the data without the seasonal component.
+* The above plotted graph  shows the data without seasonal component  which is in Red. 
+```{r}
+f_stl <- forecast(stl_decomp,h=15)
+f_stl
+plot(f_stl)
+```
+* The f_stl above is forecasting the data. the "h" mentioned is the time period for which we need the forecast. 
+* In the plot, the dark and light gray area is the 85% and 95% confidence interval of the forecast respectively.
+```{r}
+f_stl2 <- forecast(stl_decomp,h=100)
+plot(f_stl2)
+```
+* Here, the h is taken to be 100 to understand fucnction better.
+* This shows us that as time period of forecast increases, the confidence interval also increases.
+* Which means as the more time we forecast, the more worse our forecast is. Which makes sense.
+
+## Another way of Decompose
+
+```{r}
+decomp_fdeaths <- decompose(fdeaths)
+
+attributes(decomp_fdeaths)
+seasadj(decomp_fdeaths)
+```
+
+* decompose() function is one more way of using decompose.
+* In the attribute we can see that there are trend, seasonal, and random variations.
+* seasadj does the same job of adjusting the seasonal variation in the data.
+
+
+```{r}
+plot(decomp_fdeaths)
+```
+
+* In the plot, it can be seen that the order of showing the trend, seasonal, and irregularity is different but the visuals are the same.
+* "random" indicates the irregularity component and it is shown is a line graph for this function.
