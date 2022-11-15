@@ -1,0 +1,134 @@
+---
+title: "BF_HW_ARIMA"
+author: "sp2245@scarletmail.rutgers.edu"
+date: "11/10/2022"
+output: html_document
+---
+```{r}
+library(fpp)
+library(fpp2)
+library(forecast)
+
+## Data set- fdeaths
+#### fdeaths plot
+fdeaths
+plot(fdeaths, main = 'No of Deaths caused', xlab = 'Year', ylab = 'count')
+
+
+```
+
+* We can observe that the data  has seasonality.
+
+### Window plot
+
+```{r}
+deaths_win <- window(fdeaths, start = 1976)
+plot(deaths_win, main = 'No of Deaths caused', xlab = 'Year', ylab = 'count')
+
+```
+
+* We can observe that after  applying windows fucntion and taking a window from 1976  to the data, we still see seasonality in the data.
+
+#### Acf plot
+
+```{r}
+Acf(deaths_win, main = 'Acf Plot - deaths from 1976')
+```
+*We see seasonality after using the Acf function as well.
+
+## ARIMA for data with seasonal component
+
+#### Checking the Differencing needed for seasonal component
+
+nsdiffs(deaths_win) # nsdiffs is for seasonal
+
+#nsdiffs is use to know how many differences we need to do for seasonality component.
+
+
+#### Checking the Differences needed
+
+ndiffs(deaths_win)
+# We got the ndiffs as 0
+
+#### Rechecking the differencing needed after performing the seasonal differencing.
+
+ndiffs((diff(deaths_win,12)))
+# The ndiffs still shows as 0.
+
+#### Acf and Pacf plots
+
+```{r}
+tsdisplay(diff(fdeaths,12))
+```
+* In the Acf plot we can see that the p value is 2.
+
+#### Arima Model
+
+```{r}
+arima_fit <- auto.arima(deaths_win,trace=TRUE, stepwise = FALSE )
+arima_fit
+```
+ * The system runs the auto arima and gives out the best model for which the AIC value is the lowest. The AIC value is 422.71 and the ARIMA(2,0,1)(1,1,0)[12].
+
+#### Arima Model attributes
+ 
+```{r}
+attributes(arima_fit)
+```
+
+#### Plotting forecast of the Arima model with 99.5% confidence
+
+```{r}
+plot(forecast(arima_fit,h=5,level=c(99.5)), main = 'Forecast of the ARIMA model', xlab = 'Year', ylab = 'Count')
+```
+
+
+## Residual Analysis
+
+#### Acf of Residuals
+
+```{r}
+Acf(arima_fit$residuals)
+```
+ * We can observe that none of the data passes the confidence interval limits.
+* Which means that the forecast is a good forecast.
+
+#### Box-Ljung test
+```{r}
+Box.test(residuals(arima_fit), lag=20, type="Ljung")
+
+```
+ * The p-value is greater than 0.05  ( p value= 0.9079) so we can determine that  the null hypothesis is supported.
+* The residuals are random.
+
+#### Residuals plot
+
+```{r}
+plot.ts(residuals(arima_fit))
+```
+* The residuals appear to be random adn we can say this is a good forecasting model.
+
+#### Histogram plot of residuals
+```{r}
+hist(arima_fit$residuals)
+```
+* We can observe that the distribution is not normally distributed and left skewed as well.
+
+
+#### TSDiagram of the ARIMA model
+```{r}
+tsdiag(arima_fit)
+```
+ 
+ * The standardized residuals plot looks good.  We can see 3 residuals  are very close to touch.
+
+ * There are no significant values in the Acf plot as we see there are no values above the confidence interval.
+
+ * The p-values in Ljung-Box test are also above level and the points  are above the confidence interval line ( blue line).
+* The  ARIMA model is a good fit.
+
+
+
+
+
+
